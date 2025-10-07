@@ -1,0 +1,7 @@
+{
+  "name": "Tinder-App",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
