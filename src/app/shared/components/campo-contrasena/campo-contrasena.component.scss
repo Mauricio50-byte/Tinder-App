@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+ion-item {
+  --inner-padding-end: 8px;
+}
+
+ion-button[fill='clear'] {
+  color: var(--ion-color-medium);
+}

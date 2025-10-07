@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { EncabezadoAuthComponent } from './components/encabezado-auth/encabezado-auth.component';
 import { BotonGoogleComponent } from './components/boton-google/boton-google.component';
-import { MensajeErrorComponent } from './components/mensaje-error/mensaje-error.component';
 import { SeparadorComponent } from './components/separador/separador.component';
 import { LogoComponent } from './components/logo/logo.component';
+import { CampoContrasenaComponent } from './components/campo-contrasena/campo-contrasena.component';
 
 
 
@@ -13,9 +13,9 @@ import { LogoComponent } from './components/logo/logo.component';
   declarations: [
     EncabezadoAuthComponent,
     BotonGoogleComponent,
-    MensajeErrorComponent,
     SeparadorComponent,
     LogoComponent,
+    CampoContrasenaComponent,
   ],
   imports: [
     CommonModule,
@@ -24,9 +24,10 @@ import { LogoComponent } from './components/logo/logo.component';
   exports: [
     EncabezadoAuthComponent,
     BotonGoogleComponent,
-    MensajeErrorComponent,
     SeparadorComponent,
     LogoComponent,
-  ]
+    CampoContrasenaComponent,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SharedModule { }

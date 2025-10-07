@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Auth } from '../../core/services/auth';
 import { Router } from '@angular/router';
+import { Notification } from '../../core/providers/notification';
 
 @Component({
   selector: 'app-register',
@@ -14,35 +15,36 @@ export class RegisterPage {
   correo = '';
   contrasena = '';
   cargando = false;
-  mensajeError = '';
 
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private auth: Auth, private router: Router, private notification: Notification) {}
 
   async registrar(): Promise<void> {
-    this.mensajeError = '';
     if (!this.nombre || !this.edad || !this.correo || !this.contrasena) {
-      this.mensajeError = 'Completa todos los campos.';
+      await this.notification.error('Completa todos los campos.');
       return;
     }
     this.cargando = true;
     try {
       await this.auth.registrarConCorreo(this.nombre, this.edad!, this.correo, this.contrasena);
+      await this.notification.success('Registro exitoso');
       this.router.navigateByUrl('/home');
     } catch (e: any) {
-      this.mensajeError = e?.message ?? 'Error al registrarse.';
+      const mensaje = e?.message ?? 'Error al registrarse.';
+      await this.notification.error(mensaje);
     } finally {
       this.cargando = false;
     }
   }
 
   async registrarConGoogle(): Promise<void> {
-    this.mensajeError = '';
     this.cargando = true;
     try {
       await this.auth.iniciarSesionConGoogle();
+      await this.notification.success('Registro exitoso');
       this.router.navigateByUrl('/home');
     } catch (e: any) {
-      this.mensajeError = e?.message ?? 'Error con Google.';
+      const mensaje = e?.message ?? 'Error con Google.';
+      await this.notification.error(mensaje);
     } finally {
       this.cargando = false;
     }

@@ -1,4 +1,11 @@
-<ion-button expand="block" color="medium" (click)="onClick()">
-  <ion-icon name="logo-google" slot="start"></ion-icon>
-  Continuar con Google
-</ion-button>
+<button type="button" class="google-btn" (click)="onClick()" aria-label="Continuar con Google">
+  <span class="google-icon" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+      <path fill="#EA4335" d="M24 9.5c3.94 0 7.5 1.47 10.28 3.88l6.14-6.14C35.98 2.61 30.33 0 24 0 14.65 0 6.74 5.39 3.09 13.23l7.95 6.16C12.77 13.67 17.97 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M47.5 24.5c0-2.1-.21-4.11-.61-6.05H24v11.5h13.18c-.57 2.96-2.3 5.46-4.9 7.13l7.46 5.79C44.67 38.9 47.5 32.28 47.5 24.5z"/>
+      <path fill="#FBBC05" d="M11.04 31.39a14.5 14.5 0 0 1 0-14.78L3.09 10.45C-.28 17.84-.28 27.16 3.09 34.55l7.95-3.16z"/>
+      <path fill="#34A853" d="M24 47.5c6.33 0 11.67-2.08 15.56-5.64l-7.46-5.79c-2.08 1.4-4.77 2.23-8.1 2.23-6.03 0-11.23-4.17-13.87-9.89l-7.95 6.16C6.74 42.61 14.65 47.5 24 47.5z"/>
+    </svg>
+  </span>
+  <span class="google-text">Continuar con Google</span>
+</button>

@@ -8,6 +8,7 @@ export const environment = {
   firebase: {
     apiKey: "AIzaSyCx8BsIuD8eDQ0TxLjqCFA5CTGY3kd3JAc",
     authDomain: "tinder-app-8acfc.firebaseapp.com",
+    databaseURL: "https://tinder-app-8acfc-default-rtdb.firebaseio.com/",
     projectId: "tinder-app-8acfc",
     storageBucket: "tinder-app-8acfc.firebasestorage.app",
     messagingSenderId: "41918120775",
