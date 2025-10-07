@@ -1,13 +1,38 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>register</ion-title>
+    <ion-title>Registro</ion-title>
   </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">register</ion-title>
-    </ion-toolbar>
   </ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Nombre</ion-label>
+      <ion-input [(ngModel)]="nombre" placeholder="Tu nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Edad</ion-label>
+      <ion-input type="number" [(ngModel)]="edad" placeholder="Tu edad"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Correo</ion-label>
+      <ion-input type="email" [(ngModel)]="correo" placeholder="correo@ejemplo.com"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Contraseña</ion-label>
+      <ion-input type="password" [(ngModel)]="contrasena" placeholder="••••••••"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <div class="acciones">
+    <ion-button expand="block" color="primary" (click)="registrar()" [disabled]="cargando">Crear cuenta</ion-button>
+    <ion-button expand="block" color="medium" (click)="registrarConGoogle()" [disabled]="cargando">Continuar con Google</ion-button>
+  </div>
+
+  <ion-text color="danger" *ngIf="mensajeError">
+    <p class="ion-padding-top">{{ mensajeError }}</p>
+  </ion-text>
 </ion-content>

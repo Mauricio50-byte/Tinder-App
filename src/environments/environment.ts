@@ -3,6 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  production: false,
+
   firebase: {
     apiKey: "AIzaSyCx8BsIuD8eDQ0TxLjqCFA5CTGY3kd3JAc",
     authDomain: "tinder-app-8acfc.firebaseapp.com",
@@ -12,7 +14,6 @@ export const environment = {
     appId: "1:41918120775:web:e28a1be84027b022f04262",
     measurementId: "G-JBMVSKCL3K"
   },
-  production: false
 };
 
 /*

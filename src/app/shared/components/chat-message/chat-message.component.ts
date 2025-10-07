@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-chat-message',
   templateUrl: './chat-message.component.html',
   styleUrls: ['./chat-message.component.scss'],
+  standalone: false,
 })
 export class ChatMessageComponent  implements OnInit {
 
