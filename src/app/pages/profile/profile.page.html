@@ -1,13 +1,79 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>profile</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" text="Home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Perfil</ion-title>
   </ion-toolbar>
+  <ion-progress-bar *ngIf="cargando || subiendo" type="indeterminate"></ion-progress-bar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">profile</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" sizeMd="8" sizeLg="6">
+        <ion-card class="perfil-card">
+          <ion-card-header>
+            <ion-card-title>Tu perfil</ion-card-title>
+            <ion-card-subtitle>{{ usuario?.email }}</ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="avatar-wrapper">
+              <ion-avatar class="avatar">
+                <img *ngIf="previewUrl; else actualFoto" [src]="previewUrl" alt="preview" />
+                <ng-template #actualFoto>
+                  <img *ngIf="usuario?.fotoUrl; else sinFoto" [src]="usuario?.fotoUrl" alt="foto perfil" />
+                  <ng-template #sinFoto>
+                    <img src="assets/placeholder-avatar.svg" alt="sin foto" />
+                  </ng-template>
+                </ng-template>
+              </ion-avatar>
+            </div>
+
+            <ion-button expand="block" color="primary" (click)="tomarFoto()">
+              Tomar foto
+            </ion-button>
+            <ion-button expand="block" fill="outline" (click)="seleccionarFoto()">
+              Seleccionar desde galería
+            </ion-button>
+
+            <div *ngIf="previewUrl" class="preview-actions">
+              <ion-button color="success" (click)="guardarFoto()" [disabled]="subiendo">
+                Guardar como foto de perfil
+              </ion-button>
+              <ion-button color="medium" fill="clear" (click)="cancelarPreview()" [disabled]="subiendo">
+                Cancelar
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Formulario de edición de perfil (excepto correo) -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Editar información</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="stacked">Nombre</ion-label>
+              <ion-input [(ngModel)]="formNombre" placeholder="Tu nombre" required></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Edad</ion-label>
+              <ion-input [(ngModel)]="formEdad" type="number" min="0" placeholder="Tu edad" required></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Bio</ion-label>
+              <ion-textarea [(ngModel)]="formBio" autoGrow="true" placeholder="Cuéntanos sobre ti"></ion-textarea>
+            </ion-item>
+
+            <ion-button expand="block" color="primary" (click)="guardarInfo()" [disabled]="cargando || subiendo">
+              Guardar cambios
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

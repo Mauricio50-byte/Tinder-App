@@ -49,4 +49,8 @@ export class RegisterPage {
       this.cargando = false;
     }
   }
+
+  irALogin(): void {
+    this.router.navigateByUrl('/login');
+  }
 }
