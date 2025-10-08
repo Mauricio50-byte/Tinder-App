@@ -23,6 +23,7 @@ import android.util.Base64;
 public class FilePickerPlugin extends Plugin {
 
     private static final int REQUEST_IMAGE_PICK = 1001;
+    private static final int REQUEST_FILE_PICK = 1002;
 
     @PluginMethod
     public void pickImage(PluginCall call) {
@@ -34,9 +35,19 @@ public class FilePickerPlugin extends Plugin {
         startActivityForResult(call, intent, REQUEST_IMAGE_PICK);
     }
 
+    @PluginMethod
+    public void pickFile(PluginCall call) {
+        saveCall(call);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(call, intent, REQUEST_FILE_PICK);
+    }
+
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != REQUEST_IMAGE_PICK) {
+        if (requestCode != REQUEST_IMAGE_PICK && requestCode != REQUEST_FILE_PICK) {
             return;
         }
 

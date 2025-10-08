@@ -36,6 +36,28 @@ export class FilePickerPlugin {
     return file;
   }
 
+  /**
+   * Selecciona un archivo genérico desde el dispositivo.
+   * No valida tipo de imagen; devuelve Blob según mimeType.
+   */
+  async pickFile(): Promise<Blob> {
+    try {
+      if (Capacitor.getPlatform() !== 'web') {
+        const NativeFilePicker = this.getNative();
+        if (NativeFilePicker?.pickFile) {
+          const res = await NativeFilePicker.pickFile();
+          return this.toBlob(res);
+        }
+      }
+    } catch (_) {
+      // Fallback web si falla el nativo
+    }
+
+    const input = this.createHiddenInput('*/*');
+    const file = await this.waitForFile(input);
+    return file;
+  }
+
   // --- Fallback helpers ---
   private getNative(): any | undefined {
     try {
@@ -101,9 +123,7 @@ export class FilePickerPlugin {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: mime });
-    this.ensureImageType(blob);
-    return blob;
+    return new Blob([byteArray], { type: mime });
   }
 
   private ensureImageType(blob: Blob): void {
