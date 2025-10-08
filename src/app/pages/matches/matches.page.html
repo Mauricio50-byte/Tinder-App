@@ -1,13 +1,31 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>matches</ion-title>
+    <ion-title>Emparejamientos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cargarCandidatos()" [disabled]="cargando">Refrescar</ion-button>
+    </ion-buttons>
   </ion-toolbar>
+  <ion-progress-bar *ngIf="cargando" type="indeterminate"></ion-progress-bar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">matches</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-list *ngIf="candidatos.length; else vacio">
+    <ion-item *ngFor="let u of candidatos">
+      <ion-avatar slot="start">
+        <img [src]="u.fotoUrl || 'assets/icon/favicon.png'" alt="foto" />
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ u.nombre }}</h2>
+        <p>Edad: {{ u.edad }}</p>
+        <p *ngIf="u.bio">{{ u.bio }}</p>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button color="success" (click)="aceptar(u)">Aceptar</ion-button>
+        <ion-button color="medium" (click)="rechazar(u)">Rechazar</ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+  <ng-template #vacio>
+    <ion-text color="medium">No hay candidatos por ahora.</ion-text>
+  </ng-template>
 </ion-content>

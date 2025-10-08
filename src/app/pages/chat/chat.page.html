@@ -1,13 +1,29 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>chat</ion-title>
+    <ion-title>Chat</ion-title>
   </ion-toolbar>
+  <ion-progress-bar *ngIf="cargando" type="indeterminate"></ion-progress-bar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">chat</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-item>
+    <ion-label>Conversación</ion-label>
+    <ion-select interface="popover" placeholder="Selecciona un match" (ionChange)="seleccionarUsuario($event.detail.value)">
+      <ion-select-option *ngFor="let u of matches" [value]="u">{{ u.nombre }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-list>
+    <ion-item *ngFor="let m of mensajes">
+      <ion-label>
+        <small>{{ m.remitenteId === seleccionado?.id ? 'Ell@' : 'Tú' }} • {{ m.timestamp | date:'shortTime' }}</small>
+        <div>{{ m.texto }}</div>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-item>
+    <ion-input [(ngModel)]="texto" placeholder="Escribe un mensaje"></ion-input>
+    <ion-button (click)="enviar()" [disabled]="!seleccionado || !texto">Enviar</ion-button>
+  </ion-item>
 </ion-content>
