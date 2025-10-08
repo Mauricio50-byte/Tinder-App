@@ -83,6 +83,7 @@ ion-card {
     padding: 8px 4px;
     gap: 12px;
     scroll-snap-type: x mandatory;
+    touch-action: pan-x; /* evitar listeners no pasivos en gestos de desplazamiento horizontal */
   }
 
   .features-carousel .dashboard-card {

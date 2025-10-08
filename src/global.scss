@@ -35,3 +35,13 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Reducir advertencias de listeners no pasivos en gestos de desplazamiento */
+ion-content, ion-refresher, body {
+  touch-action: pan-y;
+}
+
+/* Contenedores con desplazamiento vertical personalizados */
+.scroll-y {
+  touch-action: pan-y;
+}

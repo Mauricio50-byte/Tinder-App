@@ -6,6 +6,7 @@ import { Firebase } from '../../core/providers/firebase';
 import { Notification } from '../../core/providers/notification';
 import { Storage } from '../../core/providers/storage';
 import { CameraPlugin } from '../../plugins/camera';
+import { FilePickerPlugin } from '../../plugins/file-picker';
 import { Usuario } from '../../shared/interfaces/user';
 
 @Component({
@@ -30,6 +31,7 @@ export class ProfilePage implements OnInit {
     private notification: Notification,
     private storage: Storage,
     private camera: CameraPlugin,
+    private filePicker: FilePickerPlugin,
     private router: Router,
   ) {}
 
@@ -86,7 +88,12 @@ export class ProfilePage implements OnInit {
 
   async seleccionarFoto(): Promise<void> {
     try {
-      this.fotoBlob = await this.camera.seleccionarDeGaleria();
+      // Preferir plugin nativo Java si está disponible; fallback al wrapper de cámara
+      try {
+        this.fotoBlob = await this.filePicker.pickImage();
+      } catch {
+        this.fotoBlob = await this.camera.seleccionarDeGaleria();
+      }
       this.previewUrl = URL.createObjectURL(this.fotoBlob);
     } catch (e: any) {
       await this.notification.error(e?.message ?? 'No se pudo seleccionar la foto');
@@ -126,7 +133,8 @@ export class ProfilePage implements OnInit {
 
       // Validaciones básicas
       const nombre = (this.formNombre || '').trim();
-      const edad = Number(this.formEdad ?? 0);
+      // Forzar número entero no negativo
+      const edad = Number.isFinite(Number(this.formEdad)) ? Math.max(0, Math.floor(Number(this.formEdad))) : 0;
       const bio = (this.formBio || '').trim();
       if (!nombre) {
         await this.notification.error('El nombre es obligatorio');
@@ -140,7 +148,12 @@ export class ProfilePage implements OnInit {
       this.cargando = true;
       const cambios: Partial<Usuario> = { nombre, edad, bio };
       await update(ref(this.firebase.obtenerDB(), `usuarios/${current.uid}`), cambios);
-      if (this.usuario) {
+      // Releer desde la BD para asegurar sincronización y confirmar actualización
+      const snapshot = await get(child(ref(this.firebase.obtenerDB()), `usuarios/${current.uid}`));
+      if (snapshot.exists()) {
+        this.usuario = snapshot.val() as Usuario;
+        this.sincronizarFormulario();
+      } else if (this.usuario) {
         this.usuario.nombre = nombre;
         this.usuario.edad = edad;
         this.usuario.bio = bio;

@@ -60,7 +60,7 @@
     </ng-template>
   </ion-card>
 
-  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)" [disabled]="true">
     <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
   </ion-refresher>
 
