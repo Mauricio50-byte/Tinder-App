@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firebase } from '../providers/firebase';
 import { Mensaje } from '../../shared/interfaces/message';
-import { ref, push, onChildAdded, off } from 'firebase/database';
+import { ref, push, onChildAdded, off, child, get, set } from 'firebase/database';
 
 @Injectable({ providedIn: 'root' })
 export class Chat {
@@ -15,6 +15,15 @@ export class Chat {
   async enviarMensaje(uidRemitente: string, uidDestinatario: string, texto: string): Promise<void> {
     const convId = this.idConversacion(uidRemitente, uidDestinatario);
     const base = ref(this.firebase.obtenerDB(), `mensajes/${convId}`);
+    // Asegurar metadatos de conversación (participantes) para reglas
+    try {
+      const metaRef = child(base, 'meta');
+      const [a, b] = [uidRemitente, uidDestinatario].sort();
+      const metaSnap = await get(metaRef);
+      if (!metaSnap.exists()) {
+        await set(metaRef, { a, b });
+      }
+    } catch {}
     const mensaje: Mensaje = {
       id: '',
       remitenteId: uidRemitente,
@@ -32,7 +41,20 @@ export class Chat {
       const m = snap.val() as Mensaje;
       if (m && m.texto) onMensaje(m);
     };
-    onChildAdded(base, callback);
-    return () => off(base, 'child_added', callback as any);
+    // Suscribir sólo después de garantizar meta para evitar PERMISSION_DENIED
+    let unsubscribe: () => void = () => {};
+    (async () => {
+      try {
+        const metaRef = child(base, 'meta');
+        const [a, b] = [uidA, uidB].sort();
+        const metaSnap = await get(metaRef);
+        if (!metaSnap.exists()) {
+          await set(metaRef, { a, b });
+        }
+      } catch {}
+      onChildAdded(base, callback);
+      unsubscribe = () => off(base, 'child_added', callback as any);
+    })();
+    return () => unsubscribe();
   }
 }

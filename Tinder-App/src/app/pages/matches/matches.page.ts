@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatchViewPlugin } from '../../plugins/match-view.plugin';
 import { Usuario } from '../../shared/interfaces/user';
 
@@ -13,7 +14,7 @@ export class MatchesPage implements OnInit {
   cargando = false;
   estadoMsg?: string;
 
-  constructor(private matchView: MatchViewPlugin) {}
+  constructor(private matchView: MatchViewPlugin, private router: Router) {}
 
   async ngOnInit(): Promise<void> {
     await this.cargarCandidatos();
@@ -70,5 +71,9 @@ export class MatchesPage implements OnInit {
     } else {
       this.estadoMsg = `${this.candidatos.length} candidato(s) restantes`;
     }
+  }
+
+  irAHome(): void {
+    this.router.navigateByUrl('/home');
   }
 }

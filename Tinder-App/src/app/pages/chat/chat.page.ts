@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Firebase } from '../../core/providers/firebase';
 import { Match } from '../../core/services/match';
 import { MessagingPlugin } from '../../plugins/messaging';
@@ -20,7 +21,7 @@ export class ChatPage implements OnInit, OnDestroy {
   cargando = false;
   private unsubMensajes?: () => void;
 
-  constructor(private firebase: Firebase, private match: Match, private messaging: MessagingPlugin) { }
+  constructor(private firebase: Firebase, private match: Match, private messaging: MessagingPlugin, private router: Router) { }
 
   async ngOnInit(): Promise<void> {
     await this.cargarMatches();
@@ -72,5 +73,9 @@ export class ChatPage implements OnInit, OnDestroy {
     if (!texto) return;
     await this.messaging.enviarMensaje(current.uid, this.seleccionado.id, texto);
     this.texto = '';
+  }
+
+  irAHome(): void {
+    this.router.navigateByUrl('/home');
   }
 }

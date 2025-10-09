@@ -1,6 +1,12 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Chat</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="solid" color="primary" (click)="irAHome()" aria-label="Volver al Home" title="Volver al Home">
+        <ion-icon name="home"></ion-icon>
+        <ion-label>Home</ion-label>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
   <ion-progress-bar *ngIf="cargando" type="indeterminate"></ion-progress-bar>
 </ion-header>

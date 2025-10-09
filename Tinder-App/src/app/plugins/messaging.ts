@@ -4,6 +4,7 @@ import { Mensaje } from '../shared/interfaces/message';
 import { Chat } from '../core/services/chat';
 import { Firebase } from '../core/providers/firebase';
 import { environment } from '../../environments/environment';
+import { ref, get, child, set } from 'firebase/database';
 
 /**
  * Wrapper para el plugin de Mensajería.
@@ -30,6 +31,14 @@ export class MessagingPlugin {
         const idToken = await current?.getIdToken?.();
         const databaseURL = environment.firebase.databaseURL;
         if (idToken && databaseURL) {
+          const [a, b] = [remitenteId, destinatarioId].sort();
+          const convId = `${a}_${b}`;
+          const base = ref(this.firebase.obtenerDB(), `mensajes/${convId}`);
+          const metaRef = child(base, 'meta');
+          const metaSnap = await get(metaRef);
+          if (!metaSnap.exists()) {
+            await set(metaRef, { a, b });
+          }
           await this.nativo.enviarMensaje({ remitenteId, destinatarioId, texto, databaseURL, idToken });
           return;
         }
@@ -51,6 +60,16 @@ export class MessagingPlugin {
         const listener = this.nativo.addListener?.('mensaje', (m: Mensaje) => callback(m));
         current?.getIdToken()?.then(idToken => {
           if (idToken && databaseURL) {
+            (async () => {
+              const [a, b] = [uidA, uidB].sort();
+              const convId = `${a}_${b}`;
+              const base = ref(this.firebase.obtenerDB(), `mensajes/${convId}`);
+              const metaRef = child(base, 'meta');
+              const metaSnap = await get(metaRef);
+              if (!metaSnap.exists()) {
+                try { await set(metaRef, { a, b }); } catch {}
+              }
+            })();
             try { this.nativo.suscribirMensajes({ uidA, uidB, databaseURL, idToken }); } catch {}
           }
         });

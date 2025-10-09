@@ -1,0 +1,45 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "usuarios": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid"
+      },
+      ".indexOn": ["nombre", "edad"]
+    },
+
+    "matches": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        "$otherUid": {
+          ".write": "auth != null && auth.uid == $uid && root.child('usuarios').child($otherUid).exists() && newData.hasChildren(['estado','timestamp']) && (newData.child('estado').val() == 'aceptado' || newData.child('estado').val() == 'rechazado') && newData.child('timestamp').isNumber()",
+          ".validate": "newData.hasChildren(['estado','timestamp']) && (newData.child('estado').val() == 'aceptado' || newData.child('estado').val() == 'rechazado') && newData.child('timestamp').isNumber()"
+        },
+        ".indexOn": ["timestamp", "estado"]
+      }
+    },
+
+    "mensajes": {
+      "$convId": {
+        ".read": "auth != null",
+
+        "meta": {
+          ".read": "auth != null && (data.child('a').val() == auth.uid || data.child('b').val() == auth.uid)",
+          ".write": "auth != null && !data.exists() && newData.hasChildren(['a','b']) && newData.child('a').isString() && newData.child('b').isString() && newData.child('a').val() < newData.child('b').val() && (newData.child('a').val() == auth.uid || newData.child('b').val() == auth.uid)",
+          ".validate": "newData.hasChildren(['a','b']) && newData.child('a').isString() && newData.child('b').isString() && newData.child('a').val() < newData.child('b').val()"
+        },
+
+        "$msgId": {
+          ".read": "auth != null && (data.parent().child('meta/a').val() == auth.uid || data.parent().child('meta/b').val() == auth.uid)",
+          ".write": "auth != null && newData.hasChildren(['remitenteId','destinatarioId','texto','timestamp']) && newData.child('remitenteId').isString() && newData.child('destinatarioId').isString() && newData.child('texto').isString() && newData.child('texto').val().length > 0 && newData.child('texto').val().length <= 1000 && newData.child('timestamp').isNumber() && newData.child('remitenteId').val() == auth.uid && ((newData.child('remitenteId').val() == data.parent().child('meta/a').val() && newData.child('destinatarioId').val() == data.parent().child('meta/b').val()) || (newData.child('remitenteId').val() == data.parent().child('meta/b').val() && newData.child('destinatarioId').val() == data.parent().child('meta/a').val()))",
+          ".validate": "newData.hasChildren(['remitenteId','destinatarioId','texto','timestamp']) && newData.child('remitenteId').isString() && newData.child('destinatarioId').isString() && newData.child('texto').isString() && newData.child('texto').val().length > 0 && newData.child('timestamp').isNumber()"
+        },
+
+        ".indexOn": ["timestamp"]
+      }
+    }
+  }
+}
