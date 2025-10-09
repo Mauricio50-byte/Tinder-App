@@ -9,6 +9,9 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
+  <ion-item lines="none" *ngIf="estadoMsg">
+    <ion-text color="medium">{{ estadoMsg }}</ion-text>
+  </ion-item>
   <ion-list *ngIf="candidatos.length; else vacio">
     <ion-item *ngFor="let u of candidatos">
       <ion-avatar slot="start">
@@ -20,12 +23,15 @@
         <p *ngIf="u.bio">{{ u.bio }}</p>
       </ion-label>
       <ion-buttons slot="end">
-        <ion-button color="success" (click)="aceptar(u)">Aceptar</ion-button>
-        <ion-button color="medium" (click)="rechazar(u)">Rechazar</ion-button>
+        <ion-button color="success" (click)="aceptar(u)" [disabled]="cargando">Aceptar</ion-button>
+        <ion-button color="medium" (click)="rechazar(u)" [disabled]="cargando">Rechazar</ion-button>
       </ion-buttons>
     </ion-item>
   </ion-list>
   <ng-template #vacio>
     <ion-text color="medium">No hay candidatos por ahora.</ion-text>
+    <div class="ion-margin-top">
+      <ion-button (click)="cargarCandidatos()" [disabled]="cargando">Cargar más</ion-button>
+    </div>
   </ng-template>
 </ion-content>

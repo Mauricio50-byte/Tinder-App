@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { registerPlugin, Capacitor } from '@capacitor/core';
 import { Mensaje } from '../shared/interfaces/message';
 import { Chat } from '../core/services/chat';
+import { Firebase } from '../core/providers/firebase';
+import { environment } from '../../environments/environment';
 
 /**
  * Wrapper para el plugin de Mensajería.
@@ -12,7 +14,7 @@ import { Chat } from '../core/services/chat';
 export class MessagingPlugin {
   private nativo?: any;
 
-  constructor(private chat: Chat) {
+  constructor(private chat: Chat, private firebase: Firebase) {
     try {
       this.nativo = registerPlugin<any>('Messaging');
     } catch {
@@ -24,7 +26,13 @@ export class MessagingPlugin {
     // Intento nativo si no estamos en web y existe método
     if (Capacitor.getPlatform() !== 'web' && this.nativo?.enviarMensaje) {
       try {
-        await this.nativo.enviarMensaje({ remitenteId, destinatarioId, texto });
+        const current = this.firebase.obtenerAuth().currentUser;
+        const idToken = await current?.getIdToken?.();
+        const databaseURL = environment.firebase.databaseURL;
+        if (idToken && databaseURL) {
+          await this.nativo.enviarMensaje({ remitenteId, destinatarioId, texto, databaseURL, idToken });
+          return;
+        }
         return;
       } catch {
         // Fallback si falla
@@ -38,8 +46,18 @@ export class MessagingPlugin {
     // Preferencia por nativo si disponible
     if (Capacitor.getPlatform() !== 'web' && this.nativo?.suscribirMensajes) {
       try {
-        // Se asume que el plugin nativo expone una suscripción y devuelve una función de desuscripción
-        return this.nativo.suscribirMensajes({ uidA, uidB }, callback);
+        const current = this.firebase.obtenerAuth().currentUser;
+        const databaseURL = environment.firebase.databaseURL;
+        const listener = this.nativo.addListener?.('mensaje', (m: Mensaje) => callback(m));
+        current?.getIdToken()?.then(idToken => {
+          if (idToken && databaseURL) {
+            try { this.nativo.suscribirMensajes({ uidA, uidB, databaseURL, idToken }); } catch {}
+          }
+        });
+        return () => {
+          try { this.nativo.detenerSuscripcion({ uidA, uidB }); } catch {}
+          try { listener?.remove?.(); } catch {}
+        };
       } catch {
         // Continuar con fallback web
       }
