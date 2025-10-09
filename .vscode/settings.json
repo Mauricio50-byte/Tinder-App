@@ -1,0 +1,22 @@
+{
+    "netbeans.jdkhome": "c:\\Program Files\\Java\\jdk-21",
+    "netbeans.project.jdkhome": "c:\\Program Files\\Java\\jdk-21",
+    "java.jdt.ls.java.home": "c:\\Program Files\\Java\\jdk-21",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "c:\\Program Files\\Java\\jdk-21",
+            "default": true
+        }
+    ],
+    "terminal.integrated.env.windows": {
+        "JAVA_HOME": "c:\\Program Files\\Java\\jdk-21",
+        "PATH": "c:\\Program Files\\Java\\jdk-21\\bin;${env:PATH}"
+    },
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "JAVA_HOME",
+            "value": "c:\\Program Files\\Java\\jdk-21"
+        }
+    ]
+}
