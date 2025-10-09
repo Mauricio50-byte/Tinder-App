@@ -1,0 +1,17 @@
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0;
+}
+
+.logo ion-icon {
+    color: var(--ion-color-primary);
+    font-size: 28px;
+}
+
+.logo span {
+    font-weight: 600;
+    font-size: 18px;
+}
