@@ -1,0 +1,143 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Inicio</ion-title>
+    <ion-buttons slot="end" class="toolbar-actions">
+      <ion-button fill="clear" color="medium" [disabled]="cargando" (click)="refrescarHeader()" aria-label="Refrescar" title="Refrescar">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+      <ion-button fill="solid" color="danger" (click)="cerrarSesion()" aria-label="Cerrar sesión" title="Cerrar sesión">
+        <ion-icon name="log-out"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-progress-bar *ngIf="cargando" type="indeterminate"></ion-progress-bar>
+
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-logo texto="Tinder App"></app-logo>
+
+  <!-- Tarjeta de bienvenida/perfil más visual -->
+  <ion-card class="perfil-card">
+    <ng-container *ngIf="usuario as u; else skeletonPerfil">
+      <ion-item lines="none" class="perfil-item">
+        <ng-container *ngIf="u.fotoUrl; else iconAvatar">
+          <ion-avatar slot="start">
+            <img [src]="u.fotoUrl" alt="Foto de perfil" />
+          </ion-avatar>
+        </ng-container>
+        <ng-template #iconAvatar>
+          <ion-icon slot="start" name="person-circle" class="avatar-icon"></ion-icon>
+        </ng-template>
+        <ion-label>
+          <h2>Hola, {{ u.nombre || 'Usuario' }}</h2>
+          <p>{{ u.email }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-card-content>
+        <div class="acciones">
+          <ion-button size="small" fill="outline" (click)="irAPerfil()">
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Editar perfil
+          </ion-button>
+          <ion-button size="small" color="primary" (click)="irAMatches()">
+            <ion-icon slot="start" name="heart"></ion-icon>
+            Ver matches
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ng-container>
+    <ng-template #skeletonPerfil>
+      <ion-item lines="none" class="perfil-item">
+        <ion-avatar slot="start">
+          <ion-skeleton-text animated style="width:48px;height:48px;border-radius:50%"></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <ion-skeleton-text animated style="width:60%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width:40%"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ng-template>
+  </ion-card>
+
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)" [disabled]="true">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <h3 class="section-title">Explora</h3>
+  <!-- Carrusel horizontal para móviles -->
+  <div class="features-carousel" aria-label="Acciones principales">
+    <ion-card class="dashboard-card" button (click)="irAMatches()" aria-label="Emparejamientos">
+      <ion-card-header>
+        <ion-icon name="heart" class="card-icon"></ion-icon>
+        <ion-card-title>Emparejamientos</ion-card-title>
+        <ion-card-subtitle>Explora tus matches</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        Explora posibles matches y comienza a conectar.
+      </ion-card-content>
+    </ion-card>
+    <ion-card class="dashboard-card" button (click)="irAChat()" aria-label="Chat">
+      <ion-card-header>
+        <ion-icon name="chatbubbles" class="card-icon"></ion-icon>
+        <ion-card-title>Chat</ion-card-title>
+        <ion-card-subtitle>Conversa con tus matches</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        Chatea con tus matches en tiempo real.
+      </ion-card-content>
+    </ion-card>
+    <ion-card class="dashboard-card" button (click)="irAPerfil()" aria-label="Perfil">
+      <ion-card-header>
+        <ion-icon name="person" class="card-icon"></ion-icon>
+        <ion-card-title>Perfil</ion-card-title>
+        <ion-card-subtitle>Edita tu información</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        Actualiza tu información y foto de perfil.
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Grid para tablets y escritorio -->
+  <ion-grid class="feature-grid">
+    <ion-row>
+      <ion-col size="12" sizeSm="6" sizeMd="4" sizeLg="3">
+        <ion-card class="dashboard-card" button (click)="irAMatches()">
+          <ion-card-header>
+            <ion-icon name="heart" class="card-icon"></ion-icon>
+            <ion-card-title>Emparejamientos</ion-card-title>
+            <ion-card-subtitle>Explora tus matches</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            Explora posibles matches y comienza a conectar.
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" sizeSm="6" sizeMd="4" sizeLg="3">
+        <ion-card class="dashboard-card" button (click)="irAChat()">
+          <ion-card-header>
+            <ion-icon name="chatbubbles" class="card-icon"></ion-icon>
+            <ion-card-title>Chat</ion-card-title>
+            <ion-card-subtitle>Conversa con tus matches</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            Chatea con tus matches en tiempo real.
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12" sizeSm="6" sizeMd="4" sizeLg="3">
+        <ion-card class="dashboard-card" button (click)="irAPerfil()">
+          <ion-card-header>
+            <ion-icon name="person" class="card-icon"></ion-icon>
+            <ion-card-title>Perfil</ion-card-title>
+            <ion-card-subtitle>Edita tu información</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            Actualiza tu información y foto de perfil.
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

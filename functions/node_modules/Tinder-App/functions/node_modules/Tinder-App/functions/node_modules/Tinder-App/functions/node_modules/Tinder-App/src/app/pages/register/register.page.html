@@ -1,0 +1,42 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Registro</ion-title>
+    <ion-buttons slot="end" class="toolbar-actions">
+      <ion-button fill="solid" color="primary" (click)="irALogin()" aria-label="Volver a Login" title="Volver a Login">
+        <ion-icon name="log-in"></ion-icon>
+        <ion-label>Login</ion-label>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  </ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-logo texto="Tinder App"></app-logo>
+  <app-encabezado-auth [titulo]="'Crea tu cuenta'" [subtitulo]="'Encuentra tu match'"></app-encabezado-auth>
+
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Nombre</ion-label>
+      <ion-input [(ngModel)]="nombre" placeholder="Tu nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Edad</ion-label>
+      <ion-input type="number" [(ngModel)]="edad" placeholder="Tu edad"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Correo</ion-label>
+      <ion-input type="email" [(ngModel)]="correo" placeholder="correo@ejemplo.com"></ion-input>
+    </ion-item>
+
+    <app-campo-contrasena [(value)]="contrasena" [label]="'Contraseña'" [placeholder]="'••••••••'"></app-campo-contrasena>
+  </ion-list>
+
+  <div class="acciones">
+    <ion-button expand="block" color="primary" (click)="registrar()" [disabled]="cargando">Crear cuenta</ion-button>
+    <app-separador texto="o"></app-separador>
+    <app-boton-google (clickGoogle)="registrarConGoogle()"></app-boton-google>
+  </div>
+
+</ion-content>

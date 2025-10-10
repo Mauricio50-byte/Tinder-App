@@ -1,0 +1,13 @@
+<ion-item>
+  <ion-label position="stacked">{{ label }}</ion-label>
+  <ion-input
+    [type]="mostrar ? 'text' : 'password'"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [value]="value"
+    (ionInput)="onInput($event)"
+  ></ion-input>
+  <ion-button fill="clear" slot="end" (click)="toggle()" aria-label="{{ mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña' }}">
+    <ion-icon [name]="mostrar ? 'eye-off' : 'eye'"></ion-icon>
+  </ion-button>
+</ion-item>
