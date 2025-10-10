@@ -26,10 +26,6 @@ export class MessagingPlugin {
   }
 
   async enviarMensaje(remitenteId: string, destinatarioId: string, texto: string): Promise<void> {
-    // Forzar modo web en Android para estabilidad de tiempo real
-    if (Capacitor.getPlatform() === 'android') {
-      return await this.chat.enviarMensaje(remitenteId, destinatarioId, texto);
-    }
     // Intento nativo si no estamos en web y existe método
     if (this.PREFERIR_NATIVO && Capacitor.getPlatform() !== 'web' && this.nativo?.enviarMensaje) {
       try {
@@ -58,10 +54,6 @@ export class MessagingPlugin {
   }
 
   suscribirMensajes(uidA: string, uidB: string, callback: (mensaje: Mensaje) => void): () => void {
-    // Forzar modo web en Android para estabilidad de tiempo real
-    if (Capacitor.getPlatform() === 'android') {
-      return this.chat.suscribirMensajes(uidA, uidB, callback);
-    }
     // Preferencia por nativo si disponible
     if (this.PREFERIR_NATIVO && Capacitor.getPlatform() !== 'web' && this.nativo?.suscribirMensajes) {
       try {

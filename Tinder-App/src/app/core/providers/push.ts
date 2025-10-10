@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { Firebase } from './firebase';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { ref, update } from 'firebase/database';
+import { onAuthStateChanged } from 'firebase/auth';
 
 @Injectable({ providedIn: 'root' })
 export class PushService {
   private initialized = false;
+  private lastToken?: string;
 
   constructor(private firebase: Firebase, private router: Router) {}
 
@@ -16,6 +19,9 @@ export class PushService {
     if (this.initialized) return;
     if (Capacitor.getPlatform() === 'web') return;
     try {
+      // Asegurar canal Android para FCM ('mensajes')
+      await this.ensureAndroidChannel();
+
       const perm = await PushNotifications.requestPermissions();
       if (perm.receive !== 'granted') return;
 
@@ -29,16 +35,9 @@ export class PushService {
       await PushNotifications.register();
 
       PushNotifications.addListener('registration', (token: Token) => {
-        // Guardar token para el usuario autenticado
-        const current = this.firebase.obtenerAuth().currentUser;
-        if (current) {
-          try {
-            const db = this.firebase.obtenerDB();
-            update(ref(db, `usuarios/${current.uid}`), { pushToken: token.value });
-          } catch (e) {
-            console.error('Error guardando push token', e);
-          }
-        }
+        // Persistir token incluso si el usuario inicia sesión después
+        this.lastToken = token.value;
+        this.guardarTokenSiSesion(token.value);
       });
 
       PushNotifications.addListener('registrationError', (error) => {
@@ -53,9 +52,55 @@ export class PushService {
         this.handleDeepLink(action.notification);
       });
 
+      // Si el usuario inicia sesión después del registro de push, guardar el token
+      try {
+        const auth = this.firebase.obtenerAuth();
+        onAuthStateChanged(auth, (user) => {
+          if (user && this.lastToken) {
+            try {
+              const db = this.firebase.obtenerDB();
+              update(ref(db, `usuarios/${user.uid}`), { pushToken: this.lastToken });
+            } catch (e) {
+              console.error('Error guardando push token tras login', e);
+            }
+          }
+        });
+      } catch (e) {
+        console.error('Auth state subscribe failed', e);
+      }
+
       this.initialized = true;
     } catch (e) {
       console.error('Push init failed', e);
+    }
+  }
+
+  private guardarTokenSiSesion(token: string): void {
+    const current = this.firebase.obtenerAuth().currentUser;
+    if (!current) return;
+    try {
+      const db = this.firebase.obtenerDB();
+      update(ref(db, `usuarios/${current.uid}`), { pushToken: token });
+    } catch (e) {
+      console.error('Error guardando push token', e);
+    }
+  }
+
+  private async ensureAndroidChannel(): Promise<void> {
+    if (Capacitor.getPlatform() !== 'android') return;
+    try {
+      await LocalNotifications.createChannel({
+        id: 'mensajes',
+        name: 'Mensajes',
+        description: 'Notificaciones de nuevos mensajes',
+        importance: 5, // HIGH
+        visibility: 1, // PUBLIC
+        lights: true,
+        vibration: true,
+      });
+    } catch (e) {
+      // No bloquear inicio si falla la creación del canal
+      console.warn('No se pudo crear el canal de notificaciones', e);
     }
   }
 
