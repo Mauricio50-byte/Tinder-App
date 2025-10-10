@@ -9,7 +9,12 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "build:mobile": "ng build --configuration production",
+    "cap:copy": "npx cap copy",
+    "cap:sync": "npx cap sync android",
+    "cap:run:android": "npx cap run android",
+    "cap:open:android": "npx cap open android"
   },
   "private": true,
   "dependencies": {
@@ -32,7 +37,9 @@
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor/push-notifications": "^7.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.0.0",

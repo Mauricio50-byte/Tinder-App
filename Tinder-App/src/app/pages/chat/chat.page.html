@@ -20,12 +20,19 @@
   </ion-item>
 
   <ion-list>
-    <ion-item *ngFor="let m of mensajes">
-      <ion-label>
-        <small>{{ m.remitenteId === seleccionado?.id ? 'Ell@' : 'Tú' }} • {{ m.timestamp | date:'shortTime' }}</small>
-        <div>{{ m.texto }}</div>
-      </ion-label>
-    </ion-item>
+    <ng-container *ngFor="let m of mensajes; let i = index">
+      <!-- Separador de fecha: Hoy / Ayer / fecha -->
+      <ion-item lines="full" *ngIf="i === 0 || diaLabel(m.timestamp) !== diaLabel(mensajes[i-1]?.timestamp)">
+        <ion-label class="dia-header">{{ diaLabel(m.timestamp) }}</ion-label>
+      </ion-item>
+      <!-- Mensaje -->
+      <ion-item>
+        <ion-label>
+          <small>{{ m.remitenteId === seleccionado?.id ? 'Ell@' : 'Tú' }} • {{ m.timestamp | date:'shortTime' }}</small>
+          <div>{{ m.texto }}</div>
+        </ion-label>
+      </ion-item>
+    </ng-container>
   </ion-list>
 
   <ion-item>

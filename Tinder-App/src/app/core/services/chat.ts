@@ -52,9 +52,24 @@ export class Chat {
           await set(metaRef, { a, b });
         }
       } catch {}
-      onChildAdded(base, callback);
-      unsubscribe = () => off(base, 'child_added', callback as any);
+      const stop = onChildAdded(base, callback);
+      unsubscribe = () => stop();
     })();
     return () => unsubscribe();
+  }
+
+  async listarMensajes(uidA: string, uidB: string, limite?: number): Promise<Mensaje[]> {
+    const convId = this.idConversacion(uidA, uidB);
+    const base = ref(this.firebase.obtenerDB(), `mensajes/${convId}`);
+    const snap = await get(base);
+    if (!snap.exists()) return [];
+    const data = snap.val() as Record<string, any>;
+    const items: Mensaje[] = Object.keys(data)
+      .filter(k => k !== 'meta')
+      .map(k => ({ id: k, ...data[k] }))
+      .filter(m => m && typeof m.texto === 'string' && typeof m.timestamp === 'number');
+    items.sort((a, b) => a.timestamp - b.timestamp);
+    if (limite && items.length > limite) return items.slice(items.length - limite);
+    return items;
   }
 }

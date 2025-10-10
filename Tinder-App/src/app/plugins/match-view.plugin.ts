@@ -8,6 +8,8 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class MatchViewPlugin {
   private nativo?: any;
+  private cache: Usuario[] = [];
+  private indice = 0;
 
   constructor(private match: Match, private firebase: Firebase) {
     try {
@@ -30,8 +32,13 @@ export class MatchViewPlugin {
         }
       } catch {}
     }
-    const lista = await this.match.listarPosiblesMatches();
-    return lista[0];
+    // Fallback web: devolver siguiente perfil distinto en cada llamada
+    if (!this.cache.length || this.indice >= this.cache.length) {
+      const lista = await this.match.listarPosiblesMatches();
+      this.cache = this.shuffle(lista);
+      this.indice = 0;
+    }
+    return this.cache[this.indice++];
   }
 
   async marcarAceptado(idUsuario: string): Promise<void> {
@@ -64,5 +71,14 @@ export class MatchViewPlugin {
       } catch {}
     }
     await this.match.rechazarUsuario(idUsuario);
+  }
+
+  private shuffle(arr: Usuario[]): Usuario[] {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
   }
 }
