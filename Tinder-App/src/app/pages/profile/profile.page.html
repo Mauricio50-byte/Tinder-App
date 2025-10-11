@@ -5,7 +5,8 @@
     </ion-buttons>
     <ion-title>Perfil</ion-title>
   </ion-toolbar>
-  <ion-progress-bar *ngIf="cargando || subiendo" type="indeterminate"></ion-progress-bar>
+  <ion-progress-bar *ngIf="cargando" type="indeterminate"></ion-progress-bar>
+  <ion-progress-bar *ngIf="subiendo && progreso > 0" [value]="progreso" type="determinate"></ion-progress-bar>
 </ion-header>
 
 <ion-content [fullscreen]="true">

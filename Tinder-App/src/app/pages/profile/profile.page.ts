@@ -19,6 +19,8 @@ export class ProfilePage implements OnInit {
   usuario?: Usuario;
   cargando = false;
   subiendo = false;
+  comprimiendo = false;
+  progreso = 0;
   previewUrl?: string;
   private fotoBlob?: Blob;
   // Estado del formulario (sin mutar directamente this.usuario)
@@ -101,8 +103,12 @@ export class ProfilePage implements OnInit {
   }
 
   cancelarPreview(): void {
+    if (this.previewUrl) {
+      try { URL.revokeObjectURL(this.previewUrl); } catch {}
+    }
     this.previewUrl = undefined;
     this.fotoBlob = undefined;
+    this.progreso = 0;
   }
 
   async guardarFoto(): Promise<void> {
@@ -113,8 +119,18 @@ export class ProfilePage implements OnInit {
       }
       const current = this.firebase.obtenerAuth().currentUser;
       if (!current) return;
+      // Comprimir antes de subir
+      this.comprimiendo = true;
+      let blobOptimizado: Blob;
+      try {
+        blobOptimizado = await this.comprimirImagen(this.fotoBlob);
+      } finally {
+        this.comprimiendo = false;
+      }
       this.subiendo = true;
-      const url = await this.storage.subirFotoPerfil(current.uid, this.fotoBlob);
+      const url = await this.storage.subirFotoPerfil(current.uid, blobOptimizado, (p) => {
+        this.progreso = p;
+      });
       await update(ref(this.firebase.obtenerDB(), `usuarios/${current.uid}`), { fotoUrl: url });
       if (this.usuario) this.usuario.fotoUrl = url;
       this.cancelarPreview();
@@ -123,6 +139,41 @@ export class ProfilePage implements OnInit {
       await this.notification.error(e?.message ?? 'No se pudo actualizar la foto');
     } finally {
       this.subiendo = false;
+      this.progreso = 0;
+    }
+  }
+
+  private async comprimirImagen(blob: Blob, maxDim = 1024, calidad = 0.7): Promise<Blob> {
+    // Si ya es muy pequeña, retorna igual
+    if (blob.size < 150 * 1024) return blob;
+    const img = await this.cargarImagenDesdeBlob(blob);
+    const { width, height } = img;
+    const ratio = Math.min(1, maxDim / Math.max(width, height));
+    const targetW = Math.round(width * ratio);
+    const targetH = Math.round(height * ratio);
+    const canvas = document.createElement('canvas');
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return blob;
+    ctx.drawImage(img, 0, 0, targetW, targetH);
+    const tipo = 'image/jpeg';
+    const blobResult: Blob | null = await new Promise(resolve => canvas.toBlob(b => resolve(b), tipo, calidad));
+    return blobResult ?? blob;
+  }
+
+  private async cargarImagenDesdeBlob(blob: Blob): Promise<HTMLImageElement> {
+    const url = URL.createObjectURL(blob);
+    try {
+      const img = new Image();
+      img.src = url;
+      await new Promise((res, rej) => {
+        img.onload = () => res(undefined);
+        img.onerror = (e) => rej(e);
+      });
+      return img;
+    } finally {
+      try { URL.revokeObjectURL(url); } catch {}
     }
   }
 

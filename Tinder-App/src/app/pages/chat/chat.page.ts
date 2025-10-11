@@ -57,7 +57,12 @@ export class ChatPage implements OnInit, OnDestroy {
       const usuarios: Usuario[] = [];
       for (const id of ids) {
         const snap = await get(child(ref(this.firebase.obtenerDB()), `usuarios/${id}`));
-        if (snap.exists()) usuarios.push(snap.val() as Usuario);
+        if (snap.exists()) {
+          usuarios.push(snap.val() as Usuario);
+        } else {
+          // Resiliencia: si el perfil del otro usuario no existe en DB, aún mostrar el chat por UID
+          usuarios.push({ id, nombre: id, edad: 0, email: '', fotoUrl: '', bio: '' } as Usuario);
+        }
       }
       this.matches = usuarios;
     } finally {
