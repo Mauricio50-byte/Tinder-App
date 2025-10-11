@@ -35,7 +35,10 @@ export class MatchViewPlugin {
     // Fallback web: devolver siguiente perfil distinto en cada llamada
     if (!this.cache.length || this.indice >= this.cache.length) {
       const lista = await this.match.listarPosiblesMatches();
-      this.cache = this.shuffle(lista);
+      const uidActual = this.firebase.obtenerAuth().currentUser?.uid;
+      // Filtrar explícitamente el propio perfil por seguridad adicional
+      const filtrada = uidActual ? lista.filter(u => u && u.id !== uidActual) : lista;
+      this.cache = this.shuffle(filtrada);
       this.indice = 0;
     }
     return this.cache[this.indice++];

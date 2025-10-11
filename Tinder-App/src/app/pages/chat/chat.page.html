@@ -8,7 +8,7 @@
     <ion-title>
       <div class="title-line">
         <ion-avatar *ngIf="seleccionado" class="title-avatar">
-          <img [src]="seleccionado?.fotoBase64 || seleccionado?.fotoUrl || defaultAvatar" alt="avatar" />
+          <img [src]="seleccionado.fotoBase64 || seleccionado.fotoUrl || defaultAvatar" alt="avatar" />
         </ion-avatar>
         <div class="title-block">
           <span>Chat</span>

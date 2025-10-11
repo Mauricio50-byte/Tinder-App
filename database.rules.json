@@ -15,7 +15,6 @@
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
         "$otherUid": {
-          ".read": "auth != null && (auth.uid == $uid || auth.uid == $otherUid)",
           ".write": "auth != null && auth.uid == $uid && root.child('usuarios').child($otherUid).exists() && newData.hasChildren(['timestamp']) && newData.child('timestamp').isNumber()"
         }
       }
@@ -47,8 +46,8 @@
 
         "meta": {
           ".read": "auth != null && (data.child('a').val() == auth.uid || data.child('b').val() == auth.uid)",
-          ".write": "auth != null && !data.exists() && newData.hasChildren(['a','b']) && newData.child('a').isString() && newData.child('b').isString() && newData.child('a').val() < newData.child('b').val() && (newData.child('a').val() == auth.uid || newData.child('b').val() == auth.uid)",
-          ".validate": "newData.hasChildren(['a','b']) && newData.child('a').isString() && newData.child('b').isString() && newData.child('a').val() < newData.child('b').val()"
+          ".write": "auth != null && !data.exists() && newData.hasChildren(['a','b']) && newData.child('a').isString() && newData.child('b').isString() && newData.child('a').val() < newData.child('b').val() && (newData.child('a').val() == auth.uid || newData.child('b').val() == auth.uid)"
+
         },
 
         "$msgId": {

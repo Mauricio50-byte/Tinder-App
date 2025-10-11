@@ -31,7 +31,8 @@ export class Match {
     if (passesSnap?.exists()) Object.keys(passesSnap.val() || {}).forEach(k => yaVistos.add(k));
     if (matchesSnap?.exists()) Object.keys(matchesSnap.val() || {}).forEach(k => yaVistos.add(k));
 
-    const lista = Object.values(todos)
+    const lista = Object.entries(todos)
+      .map(([id, u]) => ({ ...u, id: u?.id || id }))
       .filter(u => u.id !== uid)
       .filter(u => !yaVistos.has(u.id));
     return lista;
@@ -42,11 +43,22 @@ export class Match {
     if (!uid) return;
     const db = this.firebase.obtenerDB();
     const ahora = Date.now();
+    // Validar que el usuario objetivo exista (las reglas lo requieren)
+    const otroSnap = await get(child(ref(db), `usuarios/${idUsuario}`));
+    if (!otroSnap.exists()) {
+      await this.notification.error('El perfil no existe o no está disponible');
+      return;
+    }
     // Registrar like del usuario actual
     await set(ref(db, `likes/${uid}/${idUsuario}`), { timestamp: ahora });
 
     // Comprobar si el otro usuario ya dio like al actual
-    const likeMutuoSnap = await get(child(ref(db), `likes/${idUsuario}/${uid}`));
+    let likeMutuoSnap: any;
+    try {
+      likeMutuoSnap = await get(child(ref(db), `likes/${idUsuario}/${uid}`));
+    } catch {
+      likeMutuoSnap = undefined;
+    }
     if (likeMutuoSnap.exists()) {
       const datosMatch = { estado: 'mutuo', timestamp: ahora };
       await Promise.all([
@@ -76,6 +88,12 @@ export class Match {
     if (!uid) return;
     const db = this.firebase.obtenerDB();
     const ahora = Date.now();
+    // Validar que el usuario objetivo exista (las reglas lo requieren)
+    const otroSnap = await get(child(ref(db), `usuarios/${idUsuario}`));
+    if (!otroSnap.exists()) {
+      await this.notification.error('El perfil no existe o no está disponible');
+      return;
+    }
     await set(ref(db, `passes/${uid}/${idUsuario}`), { timestamp: ahora });
     await set(ref(db, `matches/${uid}/${idUsuario}`), { estado: 'rechazado', timestamp: ahora });
     await this.notification.success('Has rechazado el usuario');
