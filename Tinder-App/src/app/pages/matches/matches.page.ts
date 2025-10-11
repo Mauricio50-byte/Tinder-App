@@ -35,8 +35,8 @@ export class MatchesPage implements OnInit {
         if (!siguiente) break;
         const yaVisto = vistos.has(siguiente.id) || nuevos.some(x => x.id === siguiente.id);
         if (yaVisto) {
-          // Evita bucles si el plugin retorna repetidos
-          break;
+          // Ignora repetidos y continúa buscando
+          continue;
         }
         nuevos.push(siguiente);
       }

@@ -1,0 +1,23 @@
+.match-card {
+  overflow: hidden;
+}
+
+.match-card ion-img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  background: #f2f2f7;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

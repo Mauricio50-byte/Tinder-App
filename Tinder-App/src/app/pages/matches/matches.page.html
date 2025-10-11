@@ -16,24 +16,33 @@
   <ion-item lines="none" *ngIf="estadoMsg">
     <ion-text color="medium">{{ estadoMsg }}</ion-text>
   </ion-item>
-  <ion-list *ngIf="candidatos.length; else vacio">
-    <ion-item *ngFor="let u of candidatos">
-      <ion-avatar slot="start">
-        <img [src]="u.fotoUrl || 'assets/icon/favicon.png'" alt="foto" />
-      </ion-avatar>
-      <ion-label>
-        <h2>{{ u.nombre }}</h2>
-        <p>Edad: {{ u.edad }}</p>
-        <p *ngIf="u.bio">{{ u.bio }}</p>
-      </ion-label>
-      <ion-buttons slot="end">
-        <ion-button color="success" (click)="aceptar(u)" [disabled]="cargando">Aceptar</ion-button>
-        <ion-button color="medium" (click)="rechazar(u)" [disabled]="cargando">Rechazar</ion-button>
-      </ion-buttons>
-    </ion-item>
-  </ion-list>
+  <ion-grid *ngIf="candidatos.length; else vacio">
+    <ion-row>
+      <ion-col size="12" *ngFor="let u of candidatos">
+        <ion-card class="match-card">
+          <ion-img [src]="u.fotoUrl || 'assets/icon/favicon.png'" alt="foto"></ion-img>
+          <ion-card-header>
+            <ion-card-title>
+              {{ u.nombre }}<span *ngIf="u.edad">, {{ u.edad }}</span>
+            </ion-card-title>
+            <ion-card-subtitle *ngIf="u.bio">{{ u.bio }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="actions">
+              <ion-button color="medium" fill="outline" shape="round" (click)="rechazar(u)" [disabled]="cargando" aria-label="Rechazar">
+                <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+              </ion-button>
+              <ion-button color="success" shape="round" (click)="aceptar(u)" [disabled]="cargando" aria-label="Aceptar">
+                <ion-icon slot="icon-only" name="heart-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
   <ng-template #vacio>
-    <ion-text color="medium">No hay candidatos por ahora.</ion-text>
+    <ion-text color="medium">No hay candidatos por ahora. Refresca para buscar más.</ion-text>
     <div class="ion-margin-top">
       <ion-button (click)="cargarCandidatos()" [disabled]="cargando">Cargar más</ion-button>
     </div>

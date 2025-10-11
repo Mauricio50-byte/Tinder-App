@@ -32,9 +32,21 @@ public class MatchViewPlugin extends Plugin {
             return;
         }
         try {
-            // Leer matches del usuario actual para filtrar repetidos
-            JSONObject matches = getJson(databaseURL + "matches/" + uidActual + ".json?auth=" + idToken);
+            // Leer interacciones del usuario actual para filtrar repetidos (likes, passes y matches)
             Set<String> yaVistos = new HashSet<>();
+            JSONObject likes = getJson(databaseURL + "likes/" + uidActual + ".json?auth=" + idToken);
+            if (likes != null) {
+                for (Iterator<String> it = likes.keys(); it.hasNext(); ) {
+                    yaVistos.add(it.next());
+                }
+            }
+            JSONObject passes = getJson(databaseURL + "passes/" + uidActual + ".json?auth=" + idToken);
+            if (passes != null) {
+                for (Iterator<String> it = passes.keys(); it.hasNext(); ) {
+                    yaVistos.add(it.next());
+                }
+            }
+            JSONObject matches = getJson(databaseURL + "matches/" + uidActual + ".json?auth=" + idToken);
             if (matches != null) {
                 for (Iterator<String> it = matches.keys(); it.hasNext(); ) {
                     yaVistos.add(it.next());
@@ -74,15 +86,6 @@ public class MatchViewPlugin extends Plugin {
 
     @PluginMethod
     public void marcarAceptado(PluginCall call) {
-        cambiarEstado(call, "aceptado");
-    }
-
-    @PluginMethod
-    public void marcarRechazado(PluginCall call) {
-        cambiarEstado(call, "rechazado");
-    }
-
-    private void cambiarEstado(PluginCall call, String estado) {
         String uidActual = call.getString("uidActual");
         String idUsuario = call.getString("idUsuario");
         String databaseURL = call.getString("databaseURL");
@@ -92,9 +95,43 @@ public class MatchViewPlugin extends Plugin {
             return;
         }
         try {
-            String ruta = databaseURL + "matches/" + uidActual + "/" + idUsuario + ".json?auth=" + idToken;
-            String body = "{\"estado\":\"" + estado + "\",\"timestamp\":" + System.currentTimeMillis() + "}";
-            httpPut(ruta, body);
+            long ahora = System.currentTimeMillis();
+            // Registrar like del usuario actual
+            String likeRuta = databaseURL + "likes/" + uidActual + "/" + idUsuario + ".json?auth=" + idToken;
+            String likeBody = "{\"timestamp\":" + ahora + "}";
+            httpPut(likeRuta, likeBody);
+
+            // Comprobar reciprocidad para crear match mutuo
+            JSONObject reciproco = getJson(databaseURL + "likes/" + idUsuario + "/" + uidActual + ".json?auth=" + idToken);
+            if (reciproco != null) {
+                String matchBody = "{\"estado\":\"mutuo\",\"timestamp\":" + ahora + "}";
+                String matchRuta1 = databaseURL + "matches/" + uidActual + "/" + idUsuario + ".json?auth=" + idToken;
+                String matchRuta2 = databaseURL + "matches/" + idUsuario + "/" + uidActual + ".json?auth=" + idToken;
+                httpPut(matchRuta1, matchBody);
+                httpPut(matchRuta2, matchBody);
+            }
+            call.resolve();
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void marcarRechazado(PluginCall call) {
+        String uidActual = call.getString("uidActual");
+        String idUsuario = call.getString("idUsuario");
+        String databaseURL = call.getString("databaseURL");
+        String idToken = call.getString("idToken");
+        if (uidActual == null || idUsuario == null || databaseURL == null || idToken == null) {
+            call.reject("Parámetros insuficientes: uidActual, idUsuario, databaseURL e idToken son requeridos");
+            return;
+        }
+        try {
+            long ahora = System.currentTimeMillis();
+            // Registrar pass del usuario actual
+            String passRuta = databaseURL + "passes/" + uidActual + "/" + idUsuario + ".json?auth=" + idToken;
+            String passBody = "{\"timestamp\":" + ahora + "}";
+            httpPut(passRuta, passBody);
             call.resolve();
         } catch (Exception e) {
             call.reject(e.getMessage());
