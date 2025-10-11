@@ -27,7 +27,7 @@ export class RegisterPage {
     try {
       await this.auth.registrarConCorreo(this.nombre, this.edad!, this.correo, this.contrasena);
       await this.notification.success('Registro exitoso');
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/login');
     } catch (e: any) {
       const mensaje = e?.message ?? 'Error al registrarse.';
       await this.notification.error(mensaje);
@@ -41,7 +41,7 @@ export class RegisterPage {
     try {
       await this.auth.iniciarSesionConGoogle();
       await this.notification.success('Registro exitoso');
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/login');
     } catch (e: any) {
       const mensaje = e?.message ?? 'Error con Google.';
       await this.notification.error(mensaje);
