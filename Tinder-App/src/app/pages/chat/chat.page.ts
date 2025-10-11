@@ -24,11 +24,14 @@ export class ChatPage implements OnInit, OnDestroy {
   cargandoMensajes = false;
   private ultimoTsVisto = 0;
   private unsubMensajes?: () => void;
+  yo?: Usuario;
+  defaultAvatar = 'https://ionicframework.com/docs/img/demos/avatar.svg';
 
   constructor(private firebase: Firebase, private match: Match, private messaging: MessagingPlugin, private router: Router, private notification: Notification, private route: ActivatedRoute) { }
 
   async ngOnInit(): Promise<void> {
     await this.notification.requestLocalPermission();
+    await this.cargarMiPerfil();
     await this.cargarMatches();
     const uidDestino = this.route.snapshot.queryParamMap.get('uid');
     if (uidDestino) {
@@ -67,6 +70,29 @@ export class ChatPage implements OnInit, OnDestroy {
       this.matches = usuarios;
     } finally {
       this.cargando = false;
+    }
+  }
+
+  private async cargarMiPerfil(): Promise<void> {
+    const current = this.firebase.obtenerAuth().currentUser;
+    if (!current) return;
+    try {
+      const ruta = `usuarios/${current.uid}`;
+      const snapshot = await get(child(ref(this.firebase.obtenerDB()), ruta));
+      if (snapshot.exists()) {
+        this.yo = snapshot.val() as Usuario;
+      } else {
+        // Fallback mínimo si el perfil aún no existe
+        this.yo = {
+          id: current.uid,
+          nombre: current.displayName ?? '',
+          edad: 0,
+          email: current.email ?? '',
+          fotoUrl: current.photoURL ?? ''
+        } as Usuario;
+      }
+    } catch {
+      // Silencioso: si falla, mantenemos yo sin foto
     }
   }
 

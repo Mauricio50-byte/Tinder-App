@@ -21,9 +21,9 @@
   <ion-card class="perfil-card">
     <ng-container *ngIf="usuario as u; else skeletonPerfil">
       <ion-item lines="none" class="perfil-item">
-        <ng-container *ngIf="u.fotoUrl; else iconAvatar">
+        <ng-container *ngIf="u.fotoBase64 || u.fotoUrl; else iconAvatar">
           <ion-avatar slot="start">
-            <img [src]="u.fotoUrl" alt="Foto de perfil" />
+            <img [src]="u.fotoBase64 || u.fotoUrl" alt="Foto de perfil" />
           </ion-avatar>
         </ng-container>
         <ng-template #iconAvatar>

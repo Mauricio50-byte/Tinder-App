@@ -1,0 +1,131 @@
+:host {
+  --bubble-radius: 16px;
+}
+
+.chat-content {
+  --background: var(--ion-color-light);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.picker-card {
+  margin: 8px 12px;
+  border-radius: 12px;
+  background: var(--ion-color-light);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.chat-container {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-separator {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.message-row.incoming {
+  justify-content: flex-start;
+}
+
+.message-row.outgoing {
+  justify-content: flex-end;
+}
+
+.message-bubble {
+  max-width: 72%;
+  padding: 10px 12px;
+  border-radius: var(--bubble-radius);
+  background: var(--ion-color-step-100);
+  color: var(--ion-text-color);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.message-row.outgoing .message-bubble {
+  background: var(--ion-color-primary);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+
+.message-row.incoming .message-bubble {
+  background: var(--ion-color-step-100);
+  color: var(--ion-text-color);
+  border-bottom-left-radius: 6px;
+}
+
+.message-bubble .text {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.message-bubble .meta {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.avatar {
+  --border-radius: 50%;
+  width: 28px;
+  height: 28px;
+}
+
+.input-footer {
+  --background: var(--ion-background-color);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-top: 1px solid var(--ion-color-step-150);
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-row ion-input {
+  flex: 1;
+  --background: var(--ion-color-light);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 12px;
+}
+
+@media (min-width: 768px) {
+  .message-bubble {
+    max-width: 60%;
+  }
+}

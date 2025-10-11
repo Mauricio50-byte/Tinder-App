@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { ref, set, update, get, child } from 'firebase/database';
 
 import { Firebase } from '../../core/providers/firebase';
 import { Notification } from '../../core/providers/notification';
@@ -51,11 +51,11 @@ export class ProfilePage implements OnInit {
         return;
       }
       const uid = current.uid;
-      const fs = this.firebase.obtenerFS();
-      const refDoc = doc(fs, 'usuarios', uid);
-      const snapshot = await getDoc(refDoc);
+      const db = this.firebase.obtenerDB();
+      const ruta = `usuarios/${uid}`;
+      const snapshot = await get(child(ref(db), ruta));
       if (snapshot.exists()) {
-        this.usuario = snapshot.data() as Usuario;
+        this.usuario = snapshot.val() as Usuario;
       } else {
         this.usuario = {
           id: uid,
@@ -64,7 +64,7 @@ export class ProfilePage implements OnInit {
           email: current.email ?? '',
           fotoUrl: current.photoURL ?? ''
         };
-        await setDoc(refDoc, this.usuario);
+        await set(ref(db, ruta), this.usuario);
       }
       this.sincronizarFormulario();
     } catch (e: any) {
@@ -130,8 +130,9 @@ export class ProfilePage implements OnInit {
       }
       this.subiendo = true;
       const dataUrl = await this.blobToDataURL(blobOptimizado);
-      const fs = this.firebase.obtenerFS();
-      await updateDoc(doc(fs, 'usuarios', current.uid), { fotoBase64: dataUrl });
+      const db = this.firebase.obtenerDB();
+      const ruta = `usuarios/${current.uid}`;
+      await update(ref(db, ruta), { fotoBase64: dataUrl });
       if (this.usuario) this.usuario.fotoBase64 = dataUrl;
       this.progreso = 1;
       this.cancelarPreview();
@@ -207,13 +208,13 @@ export class ProfilePage implements OnInit {
       }
 
       this.cargando = true;
-      const fs = this.firebase.obtenerFS();
-      const refDoc = doc(fs, 'usuarios', current.uid);
+      const db = this.firebase.obtenerDB();
+      const ruta = `usuarios/${current.uid}`;
       const cambios: Partial<Usuario> = { nombre, edad, bio };
-      await updateDoc(refDoc, cambios);
-      const snapshot = await getDoc(refDoc);
+      await update(ref(db, ruta), cambios);
+      const snapshot = await get(child(ref(db), ruta));
       if (snapshot.exists()) {
-        this.usuario = snapshot.data() as Usuario;
+        this.usuario = snapshot.val() as Usuario;
         this.sincronizarFormulario();
       } else if (this.usuario) {
         this.usuario.nombre = nombre;

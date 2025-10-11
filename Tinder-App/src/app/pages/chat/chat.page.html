@@ -1,42 +1,76 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Chat</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="solid" color="primary" (click)="irAHome()" aria-label="Volver al Home" title="Volver al Home">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="irAHome()" aria-label="Volver al Home" title="Volver al Home">
         <ion-icon name="home"></ion-icon>
-        <ion-label>Home</ion-label>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="title-line">
+        <ion-avatar *ngIf="seleccionado" class="title-avatar">
+          <img [src]="seleccionado?.fotoBase64 || seleccionado?.fotoUrl || defaultAvatar" alt="avatar" />
+        </ion-avatar>
+        <div class="title-block">
+          <span>Chat</span>
+          <div class="subtitle" *ngIf="seleccionado">{{ seleccionado.nombre }}</div>
+        </div>
+        <ion-badge *ngIf="seleccionado" color="success">Activo</ion-badge>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" color="medium" aria-label="Opciones">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
   <ion-progress-bar *ngIf="cargando" type="indeterminate"></ion-progress-bar>
+  <ion-progress-bar *ngIf="cargandoMensajes" type="indeterminate" color="medium"></ion-progress-bar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-item>
-    <ion-label>Conversación</ion-label>
-    <ion-select interface="popover" placeholder="Selecciona un match" (ionChange)="seleccionarUsuario($event.detail.value)">
-      <ion-select-option *ngFor="let u of matches" [value]="u">{{ u.nombre }}</ion-select-option>
-    </ion-select>
-  </ion-item>
+<ion-content [fullscreen]="true" class="chat-content">
+  <div class="picker-card">
+    <ion-item lines="none">
+      <ion-icon name="people-circle" slot="start"></ion-icon>
+      <ion-label>Conversación</ion-label>
+      <ion-select interface="popover" placeholder="Selecciona un match" (ionChange)="seleccionarUsuario($event.detail.value)">
+        <ion-select-option *ngFor="let u of matches" [value]="u">{{ u.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </div>
 
-  <ion-list>
+  <div class="chat-container">
     <ng-container *ngFor="let m of mensajes; let i = index">
-      <!-- Separador de fecha: Hoy / Ayer / fecha -->
-      <ion-item lines="full" *ngIf="i === 0 || diaLabel(m.timestamp) !== diaLabel(mensajes[i-1]?.timestamp)">
-        <ion-label class="dia-header">{{ diaLabel(m.timestamp) }}</ion-label>
-      </ion-item>
-      <!-- Mensaje -->
-      <ion-item>
-        <ion-label>
-          <small>{{ m.remitenteId === seleccionado?.id ? 'Ell@' : 'Tú' }} • {{ m.timestamp | date:'shortTime' }}</small>
-          <div>{{ m.texto }}</div>
-        </ion-label>
-      </ion-item>
+      <div class="date-separator" *ngIf="i === 0 || diaLabel(m.timestamp) !== diaLabel(mensajes[i-1]?.timestamp)">
+        <ion-chip color="light"><ion-label>{{ diaLabel(m.timestamp) }}</ion-label></ion-chip>
+      </div>
+      <div class="message-row" [ngClass]="m.remitenteId === seleccionado?.id ? 'incoming' : 'outgoing'">
+        <ion-avatar class="avatar" *ngIf="m.remitenteId === seleccionado?.id">
+          <img [src]="seleccionado?.fotoBase64 || seleccionado?.fotoUrl || defaultAvatar" alt="avatar match" />
+        </ion-avatar>
+        <div class="message-bubble">
+          <div class="text">{{ m.texto }}</div>
+          <div class="meta">
+            <span>{{ m.timestamp | date:'shortTime' }}</span>
+            <span class="from">{{ m.remitenteId === seleccionado?.id ? 'Ell@' : 'Tú' }}</span>
+          </div>
+        </div>
+        <ion-avatar class="avatar" *ngIf="m.remitenteId !== seleccionado?.id">
+          <img [src]="yo?.fotoBase64 || yo?.fotoUrl || defaultAvatar" alt="avatar tú" />
+        </ion-avatar>
+      </div>
     </ng-container>
-  </ion-list>
-
-  <ion-item>
-    <ion-input [(ngModel)]="texto" placeholder="Escribe un mensaje"></ion-input>
-    <ion-button (click)="enviar()" [disabled]="!seleccionado || !texto">Enviar</ion-button>
-  </ion-item>
+  </div>
 </ion-content>
+
+<ion-footer class="input-footer" [translucent]="true">
+  <ion-toolbar>
+    <div class="input-row">
+      <ion-input [(ngModel)]="texto" placeholder="Escribe un mensaje" clear-input></ion-input>
+      <ion-buttons slot="end">
+        <ion-button (click)="enviar()" [disabled]="!seleccionado || !texto" color="primary">
+          <ion-icon name="send"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+  </ion-toolbar>
+</ion-footer>
