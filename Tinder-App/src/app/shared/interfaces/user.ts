@@ -4,6 +4,7 @@ export interface Usuario {
   edad: number;
   email: string;
   bio?: string;
+  fotoBase64?: string;
   fotoUrl?: string;
 }
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 import { getDatabase, Database } from 'firebase/database';
+import { getFirestore, Firestore } from 'firebase/firestore';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -11,6 +12,7 @@ export class Firebase {
   private app?: FirebaseApp;
   private auth?: Auth;
   private db?: Database;
+  private fs?: Firestore;
   private proveedorGoogle = new GoogleAuthProvider();
 
   constructor() {
@@ -25,6 +27,7 @@ export class Firebase {
     }
     this.auth = getAuth(this.app);
     this.db = getDatabase(this.app);
+    this.fs = getFirestore(this.app);
   }
 
   obtenerAuth(): Auth {
@@ -33,6 +36,10 @@ export class Firebase {
 
   obtenerDB(): Database {
     return this.db!;
+  }
+
+  obtenerFS(): Firestore {
+    return this.fs!;
   }
 
   obtenerProveedorGoogle(): GoogleAuthProvider {

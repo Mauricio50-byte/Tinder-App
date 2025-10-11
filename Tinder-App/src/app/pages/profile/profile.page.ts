@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ref, get, child, update } from 'firebase/database';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 import { Firebase } from '../../core/providers/firebase';
 import { Notification } from '../../core/providers/notification';
@@ -51,10 +51,11 @@ export class ProfilePage implements OnInit {
         return;
       }
       const uid = current.uid;
-      const ruta = `usuarios/${uid}`;
-      const snapshot = await get(child(ref(this.firebase.obtenerDB()), ruta));
+      const fs = this.firebase.obtenerFS();
+      const refDoc = doc(fs, 'usuarios', uid);
+      const snapshot = await getDoc(refDoc);
       if (snapshot.exists()) {
-        this.usuario = snapshot.val() as Usuario;
+        this.usuario = snapshot.data() as Usuario;
       } else {
         this.usuario = {
           id: uid,
@@ -63,7 +64,7 @@ export class ProfilePage implements OnInit {
           email: current.email ?? '',
           fotoUrl: current.photoURL ?? ''
         };
-        await update(ref(this.firebase.obtenerDB(), ruta), this.usuario);
+        await setDoc(refDoc, this.usuario);
       }
       this.sincronizarFormulario();
     } catch (e: any) {
@@ -128,11 +129,11 @@ export class ProfilePage implements OnInit {
         this.comprimiendo = false;
       }
       this.subiendo = true;
-      const url = await this.storage.subirFotoPerfil(current.uid, blobOptimizado, (p) => {
-        this.progreso = p;
-      });
-      await update(ref(this.firebase.obtenerDB(), `usuarios/${current.uid}`), { fotoUrl: url });
-      if (this.usuario) this.usuario.fotoUrl = url;
+      const dataUrl = await this.blobToDataURL(blobOptimizado);
+      const fs = this.firebase.obtenerFS();
+      await updateDoc(doc(fs, 'usuarios', current.uid), { fotoBase64: dataUrl });
+      if (this.usuario) this.usuario.fotoBase64 = dataUrl;
+      this.progreso = 1;
       this.cancelarPreview();
       await this.notification.success('Foto de perfil actualizada');
     } catch (e: any) {
@@ -177,6 +178,15 @@ export class ProfilePage implements OnInit {
     }
   }
 
+  private async blobToDataURL(blob: Blob): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (e) => reject(e);
+      reader.readAsDataURL(blob);
+    });
+  }
+
   async guardarInfo(): Promise<void> {
     try {
       const current = this.firebase.obtenerAuth().currentUser;
@@ -197,12 +207,13 @@ export class ProfilePage implements OnInit {
       }
 
       this.cargando = true;
+      const fs = this.firebase.obtenerFS();
+      const refDoc = doc(fs, 'usuarios', current.uid);
       const cambios: Partial<Usuario> = { nombre, edad, bio };
-      await update(ref(this.firebase.obtenerDB(), `usuarios/${current.uid}`), cambios);
-      // Releer desde la BD para asegurar sincronización y confirmar actualización
-      const snapshot = await get(child(ref(this.firebase.obtenerDB()), `usuarios/${current.uid}`));
+      await updateDoc(refDoc, cambios);
+      const snapshot = await getDoc(refDoc);
       if (snapshot.exists()) {
-        this.usuario = snapshot.val() as Usuario;
+        this.usuario = snapshot.data() as Usuario;
         this.sincronizarFormulario();
       } else if (this.usuario) {
         this.usuario.nombre = nombre;

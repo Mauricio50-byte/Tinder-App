@@ -24,9 +24,12 @@
               <ion-avatar class="avatar">
                 <img *ngIf="previewUrl; else actualFoto" [src]="previewUrl" alt="preview" />
                 <ng-template #actualFoto>
-                  <img *ngIf="usuario?.fotoUrl; else sinFoto" [src]="usuario?.fotoUrl" alt="foto perfil" />
-                  <ng-template #sinFoto>
-                    <img src="assets/placeholder-avatar.svg" alt="sin foto" />
+                  <img *ngIf="usuario?.fotoBase64; else urlFoto" [src]="usuario?.fotoBase64" alt="foto perfil" />
+                  <ng-template #urlFoto>
+                    <img *ngIf="usuario?.fotoUrl; else sinFoto" [src]="usuario?.fotoUrl" alt="foto perfil" />
+                    <ng-template #sinFoto>
+                      <img src="assets/placeholder-avatar.svg" alt="sin foto" />
+                    </ng-template>
                   </ng-template>
                 </ng-template>
               </ion-avatar>
