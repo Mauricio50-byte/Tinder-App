@@ -88,7 +88,8 @@ export class ChatPage implements OnInit, OnDestroy {
         const currentUid = this.firebase.obtenerAuth().currentUser?.uid;
         const isIncoming = !!(m && currentUid && m.destinatarioId === currentUid && m.remitenteId !== currentUid);
         if (isIncoming) {
-          this.notification.scheduleLocal('Nuevo mensaje', m.texto || 'Tienes un nuevo mensaje');
+          const nombreRem = this.seleccionado?.nombre || 'Tu match';
+          this.notification.scheduleLocal(`Nuevo mensaje de ${nombreRem}`, m.texto || 'Tienes un nuevo mensaje');
         }
         this.mensajes = [...this.mensajes, m];
         if (m.timestamp > this.ultimoTsVisto) this.ultimoTsVisto = m.timestamp;

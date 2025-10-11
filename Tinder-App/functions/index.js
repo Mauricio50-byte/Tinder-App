@@ -27,10 +27,22 @@ exports.onMensajeCreado = functions.database.ref('/mensajes/{convId}/{msgId}')
         return null;
       }
 
+      // Obtener nombre del remitente para personalizar la notificación
+      let nombreRemitente = 'Tu match';
+      if (remitenteId) {
+        try {
+          const remitenteSnap = await db.ref(`usuarios/${remitenteId}`).get();
+          const remitenteData = remitenteSnap.val() || {};
+          if (remitenteData && typeof remitenteData.nombre === 'string' && remitenteData.nombre.trim()) {
+            nombreRemitente = String(remitenteData.nombre).trim();
+          }
+        } catch {}
+      }
+
       // Construir payload con notification + data para deep link
       const payload = {
         notification: {
-          title: 'Nuevo mensaje',
+          title: `Nuevo mensaje de ${nombreRemitente}`,
           body: String(texto).slice(0, 120),
         },
         android: {

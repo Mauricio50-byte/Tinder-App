@@ -44,7 +44,23 @@ export class PushService {
         console.error('Push registration error', error);
       });
 
-      PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+      PushNotifications.addListener('pushNotificationReceived', async (notification: PushNotificationSchema) => {
+        // En primer plano, mostrar notificación local con título y cuerpo
+        try {
+          const title = (notification as any)?.title || 'Nuevo mensaje';
+          const body = (notification as any)?.body || (typeof notification?.data?.texto === 'string' ? String(notification.data.texto) : 'Tienes un nuevo mensaje');
+          await LocalNotifications.schedule({
+            notifications: [
+              {
+                id: Date.now() % 2147483647,
+                title,
+                body,
+                smallIcon: 'ic_stat_name',
+                extra: {},
+              },
+            ],
+          });
+        } catch {}
         this.handleDeepLink(notification);
       });
 
